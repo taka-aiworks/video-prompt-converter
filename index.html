@@ -9,14 +9,39 @@
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
         .card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
-        .platform-card { transition: all 0.3s ease; }
+        .platform-card { 
+            transition: all 0.3s ease; 
+            cursor: pointer;
+        }
         .platform-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,0.15); }
-        .motion-card { transition: all 0.2s ease; }
-        .motion-card.selected { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+        .platform-card.selected { 
+            border-color: #3b82f6 !important; 
+            background-color: #eff6ff !important;
+            transform: translateY(-2px);
+        }
+        .motion-card { 
+            transition: all 0.2s ease; 
+            cursor: pointer;
+        }
+        .motion-card:hover { background-color: #f3f4f6; }
+        .motion-card.selected { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            color: white; 
+        }
         .copy-success { animation: copyPulse 0.6s ease; }
         @keyframes copyPulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
-        .toast { position: fixed; top: 20px; right: 20px; z-index: 1000; opacity: 0; transition: opacity 0.3s ease; }
+        .toast { 
+            position: fixed; 
+            top: 20px; 
+            right: 20px; 
+            z-index: 1000; 
+            opacity: 0; 
+            transition: opacity 0.3s ease;
+            max-width: 300px;
+        }
         .toast.show { opacity: 1; }
+        .usage-warning { animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
     </style>
 </head>
 <body class="gradient-bg min-h-screen">
@@ -47,14 +72,16 @@
                     <textarea 
                         id="inputPrompt" 
                         class="w-full h-32 p-4 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="例: solo, 1girl, red hair, blue eyes, white dress, standing, forest background, soft lighting, anime style"
-                        >solo, 1girl, red hair, blue eyes, white dress, standing, forest background, soft lighting, anime style</textarea>
-                    <div class="mt-3 flex gap-2">
-                        <button onclick="importFromExistingTool()" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
-                            📥 既存ツールから読み込み
+                        placeholder="例: solo, 1girl, red hair, blue eyes, white dress, standing, forest background, soft lighting, anime style">solo, 1girl, red hair, blue eyes, white dress, standing, forest background, soft lighting, anime style</textarea>
+                    <div class="mt-3 flex gap-2 flex-wrap">
+                        <button onclick="importFromExistingTool()" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm">
+                            📥 サンプル読み込み
                         </button>
-                        <button onclick="clearPrompt()" class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors">
+                        <button onclick="clearPrompt()" class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors text-sm">
                             🗑️ クリア
+                        </button>
+                        <button onclick="analyzePrompt()" class="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors text-sm">
+                            🔍 プロンプト分析
                         </button>
                     </div>
                 </div>
@@ -65,25 +92,25 @@
                         🎥 動画生成プラットフォーム
                     </h2>
                     <div class="grid grid-cols-2 gap-4">
-                        <div class="platform-card cursor-pointer p-4 border-2 border-gray-200 rounded-lg text-center" onclick="selectPlatform('runway')">
+                        <div class="platform-card p-4 border-2 border-gray-200 rounded-lg text-center" onclick="selectPlatform('runway', this)">
                             <div class="text-3xl mb-2">🎬</div>
                             <div class="font-medium">Runway ML</div>
-                            <div class="text-sm text-gray-600">高品質・英語</div>
+                            <div class="text-sm text-gray-600">高品質・英語推奨</div>
                         </div>
-                        <div class="platform-card cursor-pointer p-4 border-2 border-gray-200 rounded-lg text-center" onclick="selectPlatform('pika')">
+                        <div class="platform-card p-4 border-2 border-gray-200 rounded-lg text-center" onclick="selectPlatform('pika', this)">
                             <div class="text-3xl mb-2">🎭</div>
                             <div class="font-medium">Pika Labs</div>
                             <div class="text-sm text-gray-600">Discord・人気</div>
                         </div>
-                        <div class="platform-card cursor-pointer p-4 border-2 border-gray-200 rounded-lg text-center" onclick="selectPlatform('stable')">
+                        <div class="platform-card p-4 border-2 border-gray-200 rounded-lg text-center" onclick="selectPlatform('stable', this)">
                             <div class="text-3xl mb-2">📹</div>
                             <div class="font-medium">Stable Video</div>
                             <div class="text-sm text-gray-600">オープンソース</div>
                         </div>
-                        <div class="platform-card cursor-pointer p-4 border-2 border-gray-200 rounded-lg text-center" onclick="selectPlatform('leonardo')">
+                        <div class="platform-card p-4 border-2 border-gray-200 rounded-lg text-center" onclick="selectPlatform('leonardo', this)">
                             <div class="text-3xl mb-2">🎞️</div>
                             <div class="font-medium">Leonardo Motion</div>
-                            <div class="text-sm text-gray-600">総合プラットフォーム</div>
+                            <div class="text-sm text-gray-600">総合AI</div>
                         </div>
                     </div>
                 </div>
@@ -94,25 +121,29 @@
                         🎬 カメラワーク・モーション
                     </h2>
                     <div class="space-y-2">
-                        <div class="motion-card cursor-pointer p-3 border border-gray-200 rounded-lg" onclick="selectMotion('orbit', this)">
+                        <div class="motion-card p-3 border border-gray-200 rounded-lg" onclick="selectMotion('orbit', this)">
                             <div class="font-medium">🔄 カメラ回転</div>
-                            <div class="text-sm text-gray-600">キャラクターの周りを回る</div>
+                            <div class="text-sm opacity-75">キャラクターの周りを360度回転</div>
                         </div>
-                        <div class="motion-card cursor-pointer p-3 border border-gray-200 rounded-lg" onclick="selectMotion('zoom_in', this)">
+                        <div class="motion-card p-3 border border-gray-200 rounded-lg" onclick="selectMotion('zoom_in', this)">
                             <div class="font-medium">🔍 ズームイン</div>
-                            <div class="text-sm text-gray-600">徐々に近づく</div>
+                            <div class="text-sm opacity-75">顔や重要部分に徐々に近づく</div>
                         </div>
-                        <div class="motion-card cursor-pointer p-3 border border-gray-200 rounded-lg" onclick="selectMotion('sway', this)">
-                            <div class="font-medium">🌸 優しい揺れ</div>
-                            <div class="text-sm text-gray-600">髪や服が風で揺れる</div>
+                        <div class="motion-card p-3 border border-gray-200 rounded-lg" onclick="selectMotion('sway', this)">
+                            <div class="font-medium">🌸 自然な揺れ</div>
+                            <div class="text-sm opacity-75">髪や服が風で自然に揺れる</div>
                         </div>
-                        <div class="motion-card cursor-pointer p-3 border border-gray-200 rounded-lg" onclick="selectMotion('pan', this)">
+                        <div class="motion-card p-3 border border-gray-200 rounded-lg" onclick="selectMotion('pan', this)">
                             <div class="font-medium">📸 ドラマチックパン</div>
-                            <div class="text-sm text-gray-600">左右にダイナミック移動</div>
+                            <div class="text-sm opacity-75">左右に映画的な移動</div>
                         </div>
-                        <div class="motion-card cursor-pointer p-3 border border-gray-200 rounded-lg" onclick="selectMotion('parallax', this)">
+                        <div class="motion-card p-3 border border-gray-200 rounded-lg" onclick="selectMotion('parallax', this)">
                             <div class="font-medium">🌄 パララックス</div>
-                            <div class="text-sm text-gray-600">背景と前景の速度差</div>
+                            <div class="text-sm opacity-75">背景と前景の奥行き感</div>
+                        </div>
+                        <div class="motion-card p-3 border border-gray-200 rounded-lg" onclick="selectMotion('tilt', this)">
+                            <div class="font-medium">📐 チルトシフト</div>
+                            <div class="text-sm opacity-75">アングル変更で迫力演出</div>
                         </div>
                     </div>
                 </div>
@@ -124,21 +155,25 @@
                 <div class="card rounded-xl shadow-lg p-6">
                     <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
                         ⚡ 変換結果
+                        <span id="conversionStatus" class="ml-2 text-sm"></span>
                     </h2>
                     <div class="bg-gray-100 rounded-lg p-4 mb-4">
-                        <div class="text-sm text-gray-600 mb-2">
-                            <span id="selectedPlatformDisplay">プラットフォーム未選択</span> 向け最適化
+                        <div class="text-sm text-gray-600 mb-2 flex justify-between items-center">
+                            <span id="selectedPlatformDisplay">プラットフォーム未選択</span>
+                            <span id="promptLength" class="text-xs"></span>
                         </div>
-                        <div id="outputPrompt" class="font-mono text-sm bg-white p-3 rounded border min-h-[100px] whitespace-pre-wrap">
-                            プラットフォームとモーションを選択してください
-                        </div>
+                        <div id="outputPrompt" class="font-mono text-sm bg-white p-3 rounded border min-h-[120px] whitespace-pre-wrap">プラットフォームとモーションを選択してください</div>
+                        <div id="promptTips" class="mt-2 text-xs text-gray-500 hidden"></div>
                     </div>
-                    <div class="flex gap-2">
-                        <button onclick="copyToClipboard()" class="flex-1 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors flex items-center justify-center">
+                    <div class="flex gap-2 flex-wrap">
+                        <button onclick="copyToClipboard()" class="flex-1 min-w-[120px] px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors flex items-center justify-center">
                             📋 コピー
                         </button>
-                        <button onclick="downloadPrompt()" class="flex-1 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center justify-center">
+                        <button onclick="downloadPrompt()" class="flex-1 min-w-[120px] px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center justify-center">
                             💾 保存
+                        </button>
+                        <button onclick="sharePrompt()" class="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors">
+                            🔗 共有
                         </button>
                     </div>
                 </div>
@@ -150,37 +185,40 @@
                         <span class="text-gray-600">今月の使用回数</span>
                         <span class="font-bold" id="usageCount">0 / 10</span>
                     </div>
-                    <div class="w-full bg-gray-200 rounded-full h-2">
-                        <div id="usageBar" class="bg-blue-500 h-2 rounded-full" style="width: 0%"></div>
+                    <div class="w-full bg-gray-200 rounded-full h-3">
+                        <div id="usageBar" class="bg-blue-500 h-3 rounded-full transition-all duration-300" style="width: 0%"></div>
                     </div>
-                    <div class="mt-3 text-center">
-                        <button onclick="upgradeToPro()" class="px-6 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all">
-                            ⭐ Pro版にアップグレード（無制限）
+                    <div class="mt-4 text-center">
+                        <button onclick="upgradeToPro()" class="w-full px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all transform hover:scale-105">
+                            ⭐ Pro版にアップグレード（無制限＋高度機能）
                         </button>
+                    </div>
+                    <div id="resetInfo" class="mt-2 text-xs text-gray-500 text-center">
+                        使用回数は毎月1日にリセットされます
                     </div>
                 </div>
 
-                <!-- 機能説明 -->
+                <!-- プレビュー・ヒント -->
                 <div class="card rounded-xl shadow-lg p-6">
-                    <h3 class="font-bold text-gray-800 mb-3">💡 主な機能</h3>
-                    <ul class="space-y-2 text-sm">
-                        <li class="flex items-start">
+                    <h3 class="font-bold text-gray-800 mb-3">💡 使い方のコツ</h3>
+                    <div class="space-y-3 text-sm">
+                        <div class="flex items-start">
                             <span class="text-green-500 mr-2 font-bold">✓</span>
-                            <span>各動画AI専用の構文に自動最適化</span>
-                        </li>
-                        <li class="flex items-start">
+                            <span><strong>キャラクター情報</strong>を詳しく（髪色、服装、表情など）</span>
+                        </div>
+                        <div class="flex items-start">
                             <span class="text-green-500 mr-2 font-bold">✓</span>
-                            <span>プリセットのカメラワーク・モーション追加</span>
-                        </li>
-                        <li class="flex items-start">
+                            <span><strong>背景・環境</strong>を具体的に（場所、時間、天気など）</span>
+                        </div>
+                        <div class="flex items-start">
                             <span class="text-green-500 mr-2 font-bold">✓</span>
-                            <span>既存プロンプトツールからの簡単インポート</span>
-                        </li>
-                        <li class="flex items-start">
-                            <span class="text-green-500 mr-2 font-bold">✓</span>
-                            <span>日本語対応・使いやすいUI</span>
-                        </li>
-                    </ul>
+                            <span><strong>ライティング</strong>を指定（soft light, dramatic lightingなど）</span>
+                        </div>
+                        <div class="flex items-start">
+                            <span class="text-blue-500 mr-2 font-bold">💡</span>
+                            <span id="dynamicTip">モーションによって最適なプロンプトが自動調整されます</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -190,54 +228,164 @@
         // 状態管理
         let selectedPlatform = '';
         let selectedMotion = '';
-        let usageCount = parseInt(localStorage.getItem('usageCount') || '0');
+        let usageCount = parseInt(localStorage.getItem('videoprompter_usage') || '0');
+        let lastResetMonth = parseInt(localStorage.getItem('videoprompter_month') || new Date().getMonth());
 
-        // プラットフォーム別変換ルール
+        // プラットフォーム別変換ルール（改良版）
         const converters = {
             runway: {
-                orbit: (prompt) => `${prompt}, camera slowly orbiting around subject, cinematic movement, 4 seconds`,
-                zoom_in: (prompt) => `${prompt}, slow zoom into subject's face, dramatic focus, smooth transition`,
-                sway: (prompt) => `${prompt}, gentle hair and dress movement, soft wind effect, subtle animation`,
-                pan: (prompt) => `${prompt}, dramatic left-to-right camera pan, cinematic sweep`,
-                parallax: (prompt) => `${prompt}, parallax effect with background movement, depth layers`
+                orbit: (prompt) => {
+                    const cleanPrompt = cleanupPrompt(prompt);
+                    return `${cleanPrompt}, camera slowly orbiting around subject, cinematic camera movement, smooth rotation, professional cinematography, 4 seconds duration`;
+                },
+                zoom_in: (prompt) => {
+                    const cleanPrompt = cleanupPrompt(prompt);
+                    return `${cleanPrompt}, slow dramatic zoom into subject's face, gradual close-up, smooth camera movement, cinematic focus pull`;
+                },
+                sway: (prompt) => {
+                    const cleanPrompt = cleanupPrompt(prompt);
+                    return `${cleanPrompt}, gentle hair and clothing movement, soft wind effect, natural fabric physics, subtle animation`;
+                },
+                pan: (prompt) => {
+                    const cleanPrompt = cleanupPrompt(prompt);
+                    return `${cleanPrompt}, dramatic left-to-right camera pan, cinematic sweep movement, professional camera work`;
+                },
+                parallax: (prompt) => {
+                    const cleanPrompt = cleanupPrompt(prompt);
+                    return `${cleanPrompt}, parallax camera movement, background and foreground depth separation, layered motion`;
+                },
+                tilt: (prompt) => {
+                    const cleanPrompt = cleanupPrompt(prompt);
+                    return `${cleanPrompt}, dynamic camera tilt movement, Dutch angle transition, dramatic perspective shift`;
+                }
             },
             pika: {
-                orbit: (prompt) => `${prompt} -camera orbit -motion 1 -guidance 7.5`,
-                zoom_in: (prompt) => `${prompt} -zoom in slow -motion 2 -guidance 8.0`,
-                sway: (prompt) => `${prompt} -gentle sway -wind effect -motion 0.8`,
-                pan: (prompt) => `${prompt} -camera pan -dramatic -motion 2.5`,
-                parallax: (prompt) => `${prompt} -parallax movement -depth -motion 1.5`
+                orbit: (prompt) => {
+                    const cleanPrompt = cleanupPrompt(prompt);
+                    return `${cleanPrompt} -camera orbit -motion 1.2 -guidance 7.5 -fps 24`;
+                },
+                zoom_in: (prompt) => {
+                    const cleanPrompt = cleanupPrompt(prompt);
+                    return `${cleanPrompt} -zoom in slow -motion 1.8 -guidance 8.0 -fps 24`;
+                },
+                sway: (prompt) => {
+                    const cleanPrompt = cleanupPrompt(prompt);
+                    return `${cleanPrompt} -gentle sway -wind effect -motion 0.8 -guidance 7.0`;
+                },
+                pan: (prompt) => {
+                    const cleanPrompt = cleanupPrompt(prompt);
+                    return `${cleanPrompt} -camera pan -dramatic -motion 2.2 -guidance 7.5`;
+                },
+                parallax: (prompt) => {
+                    const cleanPrompt = cleanupPrompt(prompt);
+                    return `${cleanPrompt} -parallax movement -depth layers -motion 1.5 -guidance 7.0`;
+                },
+                tilt: (prompt) => {
+                    const cleanPrompt = cleanupPrompt(prompt);
+                    return `${cleanPrompt} -camera tilt -dutch angle -motion 1.6 -guidance 7.5`;
+                }
             },
             stable: {
-                orbit: (prompt) => `${prompt} | camera_motion: "orbit" | strength: 0.8 | fps: 24`,
-                zoom_in: (prompt) => `${prompt} | camera_motion: "zoom_in" | strength: 1.0 | fps: 24`,
-                sway: (prompt) => `${prompt} | object_motion: "sway" | strength: 0.4 | fps: 24`,
-                pan: (prompt) => `${prompt} | camera_motion: "pan" | strength: 1.2 | fps: 24`,
-                parallax: (prompt) => `${prompt} | camera_motion: "parallax" | strength: 0.6 | fps: 24`
+                orbit: (prompt) => {
+                    const cleanPrompt = cleanupPrompt(prompt);
+                    return `${cleanPrompt} | camera_motion: "orbit_around_subject" | motion_strength: 0.8 | fps: 24 | duration: 4s`;
+                },
+                zoom_in: (prompt) => {
+                    const cleanPrompt = cleanupPrompt(prompt);
+                    return `${cleanPrompt} | camera_motion: "zoom_in_smooth" | motion_strength: 1.0 | fps: 24 | duration: 4s`;
+                },
+                sway: (prompt) => {
+                    const cleanPrompt = cleanupPrompt(prompt);
+                    return `${cleanPrompt} | object_motion: "gentle_sway" | motion_strength: 0.4 | fps: 24 | wind_effect: true`;
+                },
+                pan: (prompt) => {
+                    const cleanPrompt = cleanupPrompt(prompt);
+                    return `${cleanPrompt} | camera_motion: "horizontal_pan" | motion_strength: 1.2 | fps: 24 | duration: 4s`;
+                },
+                parallax: (prompt) => {
+                    const cleanPrompt = cleanupPrompt(prompt);
+                    return `${cleanPrompt} | camera_motion: "parallax_effect" | depth_layers: true | motion_strength: 0.6 | fps: 24`;
+                },
+                tilt: (prompt) => {
+                    const cleanPrompt = cleanupPrompt(prompt);
+                    return `${cleanPrompt} | camera_motion: "tilt_shift" | dutch_angle: true | motion_strength: 0.9 | fps: 24`;
+                }
             },
             leonardo: {
-                orbit: (prompt) => `${prompt}, motion: circular camera movement, strength: medium`,
-                zoom_in: (prompt) => `${prompt}, motion: zoom in, strength: slow`,
-                sway: (prompt) => `${prompt}, motion: gentle sway, strength: light`,
-                pan: (prompt) => `${prompt}, motion: camera pan, strength: strong`,
-                parallax: (prompt) => `${prompt}, motion: parallax, strength: medium`
+                orbit: (prompt) => {
+                    const cleanPrompt = cleanupPrompt(prompt);
+                    return `${cleanPrompt}, motion_type: "camera_orbit", intensity: "medium", duration: "4_seconds", smooth_movement: true`;
+                },
+                zoom_in: (prompt) => {
+                    const cleanPrompt = cleanupPrompt(prompt);
+                    return `${cleanPrompt}, motion_type: "zoom_in_gradual", intensity: "slow", focus_subject: true, cinematic: true`;
+                },
+                sway: (prompt) => {
+                    const cleanPrompt = cleanupPrompt(prompt);
+                    return `${cleanPrompt}, motion_type: "gentle_sway", intensity: "light", natural_movement: true, wind_effect: subtle`;
+                },
+                pan: (prompt) => {
+                    const cleanPrompt = cleanupPrompt(prompt);
+                    return `${cleanPrompt}, motion_type: "horizontal_pan", intensity: "strong", cinematic_sweep: true`;
+                },
+                parallax: (prompt) => {
+                    const cleanPrompt = cleanupPrompt(prompt);
+                    return `${cleanPrompt}, motion_type: "parallax_depth", intensity: "medium", layer_separation: true`;
+                },
+                tilt: (prompt) => {
+                    const cleanPrompt = cleanupPrompt(prompt);
+                    return `${cleanPrompt}, motion_type: "camera_tilt", intensity: "dynamic", dutch_angle: true`;
+                }
             }
         };
 
+        // プロンプトクリーンアップ関数
+        function cleanupPrompt(prompt) {
+            return prompt
+                .trim()
+                .replace(/,\s*,/g, ',') // 重複カンマ除去
+                .replace(/\s+/g, ' ') // 重複スペース除去
+                .replace(/,\s*$/, ''); // 末尾カンマ除去
+        }
+
+        // プラットフォーム固有のヒント
+        const platformTips = {
+            runway: "RunwayMLは英語プロンプトが最適です。詳細な動作指示が効果的。",
+            pika: "Pika Labsはコマンド形式(-camera, -motion)で制御します。",
+            stable: "Stable Videoはパラメータ指定(| key: value)形式です。",
+            leonardo: "Leonardo Motionは自然言語での動作指定が得意です。"
+        };
+
+        // 月間リセットチェック
+        function checkMonthlyReset() {
+            const currentMonth = new Date().getMonth();
+            if (currentMonth !== lastResetMonth) {
+                usageCount = 0;
+                lastResetMonth = currentMonth;
+                localStorage.setItem('videoprompter_usage', '0');
+                localStorage.setItem('videoprompter_month', currentMonth.toString());
+                showToast('使用回数がリセットされました！', 'info');
+            }
+        }
+
         // 初期化
         document.addEventListener('DOMContentLoaded', function() {
+            checkMonthlyReset();
             updateUsageDisplay();
+            
+            // 入力フィールドのイベントリスナー
+            document.getElementById('inputPrompt').addEventListener('input', updateOutput);
         });
 
         // プラットフォーム選択
-        function selectPlatform(platform) {
+        function selectPlatform(platform, element) {
             selectedPlatform = platform;
             
             // UI更新
             document.querySelectorAll('.platform-card').forEach(card => {
-                card.classList.remove('border-blue-500', 'bg-blue-50');
+                card.classList.remove('selected');
             });
-            event.currentTarget.classList.add('border-blue-500', 'bg-blue-50');
+            element.classList.add('selected');
             
             // プラットフォーム名表示更新
             const platformNames = {
@@ -247,6 +395,10 @@
                 leonardo: 'Leonardo Motion'
             };
             document.getElementById('selectedPlatformDisplay').textContent = platformNames[platform];
+            
+            // ヒント表示
+            document.getElementById('promptTips').textContent = platformTips[platform];
+            document.getElementById('promptTips').classList.remove('hidden');
             
             updateOutput();
         }
@@ -261,6 +413,18 @@
             });
             element.classList.add('selected');
             
+            // 動的ヒント更新
+            const motionTips = {
+                orbit: "360度回転は立体感を強調します。キャラクター全体が見えるように。",
+                zoom_in: "ズームインは感情表現に効果的。表情やディテールを重視。",
+                sway: "自然な揺れは生命感を演出。風の強さも調整可能。",
+                pan: "パンニングは空間の広がりを表現。背景も重要になります。",
+                parallax: "奥行き感を重視。前景・中景・背景の要素を意識して。",
+                tilt: "傾斜アングルは迫力や不安定感を演出。ドラマチックに。"
+            };
+            
+            document.getElementById('dynamicTip').textContent = motionTips[motion] || "モーションが選択されました";
+            
             updateOutput();
         }
 
@@ -268,30 +432,48 @@
         function updateOutput() {
             const inputPrompt = document.getElementById('inputPrompt').value.trim();
             const outputEl = document.getElementById('outputPrompt');
+            const statusEl = document.getElementById('conversionStatus');
+            const lengthEl = document.getElementById('promptLength');
             
             if (!inputPrompt) {
                 outputEl.textContent = 'プロンプトを入力してください';
+                statusEl.textContent = '';
+                lengthEl.textContent = '';
                 return;
             }
             
             if (!selectedPlatform) {
                 outputEl.textContent = 'プラットフォームを選択してください';
+                statusEl.textContent = '';
+                lengthEl.textContent = '';
                 return;
             }
             
             if (!selectedMotion) {
                 outputEl.textContent = 'モーションを選択してください';
+                statusEl.textContent = '';
+                lengthEl.textContent = '';
                 return;
             }
             
             // 変換実行
-            const converter = converters[selectedPlatform][selectedMotion];
-            const result = converter(inputPrompt);
-            outputEl.textContent = result;
+            statusEl.textContent = '🔄 変換中...';
+            setTimeout(() => {
+                const converter = converters[selectedPlatform][selectedMotion];
+                const result = converter(inputPrompt);
+                outputEl.textContent = result;
+                statusEl.textContent = '✅ 変換完了';
+                lengthEl.textContent = `${result.length}文字`;
+                
+                // 長さ警告
+                if (result.length > 500) {
+                    lengthEl.textContent += ' ⚠️ 長すぎる可能性';
+                    lengthEl.className = 'text-xs text-orange-500';
+                } else {
+                    lengthEl.className = 'text-xs text-green-600';
+                }
+            }, 300);
         }
-
-        // 入力変更時の処理
-        document.getElementById('inputPrompt').addEventListener('input', updateOutput);
 
         // コピー機能
         function copyToClipboard() {
@@ -314,7 +496,7 @@
             navigator.clipboard.writeText(outputText).then(() => {
                 // 使用回数を増加
                 usageCount++;
-                localStorage.setItem('usageCount', usageCount.toString());
+                localStorage.setItem('videoprompter_usage', usageCount.toString());
                 updateUsageDisplay();
                 
                 showToast('プロンプトをコピーしました！', 'success');
@@ -323,76 +505,291 @@
                 const btn = event.currentTarget;
                 btn.classList.add('copy-success');
                 setTimeout(() => btn.classList.remove('copy-success'), 600);
+            }).catch(() => {
+                showToast('コピーに失敗しました', 'error');
             });
         }
 
         // 保存機能
         function downloadPrompt() {
             const outputText = document.getElementById('outputPrompt').textContent;
-            const blob = new Blob([outputText], { type: 'text/plain' });
+            const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+            const platform = selectedPlatform || 'unknown';
+            const motion = selectedMotion || 'unknown';
+            
+            const content = `VideoPrompt Converter - 変換結果
+生成日時: ${new Date().toLocaleString('ja-JP')}
+プラットフォーム: ${platform}
+モーション: ${motion}
+
+変換されたプロンプト:
+${outputText}
+
+---
+元のプロンプト:
+${document.getElementById('inputPrompt').value}
+`;
+            
+            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `video-prompt-${Date.now()}.txt`;
+            a.download = `video-prompt-${platform}-${motion}-${timestamp}.txt`;
             a.click();
             URL.revokeObjectURL(url);
             
             showToast('プロンプトを保存しました！', 'success');
         }
 
-        // 既存ツールからインポート（模擬）
+        // 共有機能
+        function sharePrompt() {
+            const outputText = document.getElementById('outputPrompt').textContent;
+            const platform = selectedPlatform || 'unknown';
+            const motion = selectedMotion || 'unknown';
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: 'VideoPrompt Converter - 変換結果',
+                    text: `${platform} × ${motion}で変換:\n${outputText}`,
+                    url: window.location.href
+                }).then(() => {
+                    showToast('共有しました！', 'success');
+                }).catch(() => {
+                    copyShareText(outputText, platform, motion);
+                });
+            } else {
+                copyShareText(outputText, platform, motion);
+            }
+        }
+
+        function copyShareText(outputText, platform, motion) {
+            const shareText = `🎬 VideoPrompt Converter で変換！
+${platform} × ${motion}
+
+${outputText}
+
+#VideoAI #動画生成 #プロンプト
+${window.location.href}`;
+            
+            navigator.clipboard.writeText(shareText).then(() => {
+                showToast('共有用テキストをコピーしました！', 'success');
+            });
+        }
+
+        // 既存ツールからインポート（改良版）
         function importFromExistingTool() {
             const samplePrompts = [
-                "solo, 1girl, long hair, blue eyes, blonde hair, school uniform, classroom, sunlight",
-                "1boy, short hair, brown eyes, casual clothes, park, evening light, anime style",
-                "solo, 1girl, red hair, green eyes, white dress, flower field, soft lighting",
-                "1girl, black hair, purple eyes, kimono, traditional garden, cherry blossoms"
+                "solo, 1girl, long black hair, red eyes, gothic lolita dress, standing in moonlit garden, dramatic lighting, anime style",
+                "1boy, short brown hair, casual hoodie, sitting on park bench, sunset background, warm lighting, realistic style",
+                "solo, 1girl, blonde twin tails, school uniform, classroom window, cherry blossoms falling, soft natural light",
+                "1girl, silver hair, blue kimono, traditional japanese garden, koi pond reflection, golden hour lighting",
+                "solo, 1boy, dark hair, formal suit, city rooftop at night, neon lights, cinematic composition",
+                "1girl, pink hair, white dress, flower field, butterflies, dreamy atmosphere, pastel colors",
+                "solo, 1girl, red hair in ponytail, workout clothes, gym interior, motivational pose, bright lighting",
+                "1boy, blonde hair, fantasy armor, medieval castle background, epic composition, dramatic sky"
             ];
             
             const randomPrompt = samplePrompts[Math.floor(Math.random() * samplePrompts.length)];
             document.getElementById('inputPrompt').value = randomPrompt;
             updateOutput();
             
-            showToast('既存ツールからプロンプトを読み込みました', 'success');
+            showToast('サンプルプロンプトを読み込みました', 'success');
+        }
+
+        // プロンプト分析機能
+        function analyzePrompt() {
+            const prompt = document.getElementById('inputPrompt').value.trim();
+            if (!prompt) {
+                showToast('分析するプロンプトを入力してください', 'error');
+                return;
+            }
+
+            // 簡易分析
+            const elements = prompt.split(',').map(s => s.trim()).filter(s => s);
+            const analysis = {
+                character: elements.filter(e => e.match(/(girl|boy|person|character|solo)/i)),
+                appearance: elements.filter(e => e.match(/(hair|eyes|dress|clothes|outfit)/i)),
+                environment: elements.filter(e => e.match(/(background|garden|room|field|city)/i)),
+                lighting: elements.filter(e => e.match(/(light|lighting|glow|bright|dark)/i)),
+                style: elements.filter(e => e.match(/(anime|realistic|cinematic|style)/i))
+            };
+
+            let feedback = "📊 プロンプト分析結果:\n\n";
+            feedback += `✅ キャラクター: ${analysis.character.length > 0 ? '良好' : '追加推奨'}\n`;
+            feedback += `✅ 外見描写: ${analysis.appearance.length > 0 ? '良好' : '追加推奨'}\n`;
+            feedback += `✅ 環境設定: ${analysis.environment.length > 0 ? '良好' : '追加推奨'}\n`;
+            feedback += `✅ ライティング: ${analysis.lighting.length > 0 ? '良好' : '追加推奨'}\n`;
+            feedback += `✅ スタイル指定: ${analysis.style.length > 0 ? '良好' : '追加推奨'}\n\n`;
+
+            if (analysis.character.length === 0) {
+                feedback += "💡 キャラクター情報（solo, 1girl, 1boy等）を追加することを推奨\n";
+            }
+            if (analysis.lighting.length === 0) {
+                feedback += "💡 ライティング（soft lighting, dramatic lighting等）を追加することを推奨\n";
+            }
+
+            showToast(feedback, 'info');
         }
 
         // プロンプトクリア
         function clearPrompt() {
             document.getElementById('inputPrompt').value = '';
             updateOutput();
+            showToast('プロンプトをクリアしました', 'info');
         }
 
         // 使用状況表示更新
         function updateUsageDisplay() {
-            document.getElementById('usageCount').textContent = `${usageCount} / 10`;
-            const percentage = (usageCount / 10) * 100;
-            document.getElementById('usageBar').style.width = `${percentage}%`;
+            const countEl = document.getElementById('usageCount');
+            const barEl = document.getElementById('usageBar');
             
-            if (usageCount >= 8) {
-                document.getElementById('usageBar').className = 'bg-red-500 h-2 rounded-full';
+            countEl.textContent = `${usageCount} / 10`;
+            const percentage = (usageCount / 10) * 100;
+            barEl.style.width = `${percentage}%`;
+            
+            // 色の変更
+            if (usageCount >= 9) {
+                barEl.className = 'bg-red-500 h-3 rounded-full transition-all duration-300 usage-warning';
+                countEl.className = 'font-bold text-red-600';
+            } else if (usageCount >= 7) {
+                barEl.className = 'bg-orange-500 h-3 rounded-full transition-all duration-300';
+                countEl.className = 'font-bold text-orange-600';
             } else if (usageCount >= 5) {
-                document.getElementById('usageBar').className = 'bg-yellow-500 h-2 rounded-full';
+                barEl.className = 'bg-yellow-500 h-3 rounded-full transition-all duration-300';
+                countEl.className = 'font-bold text-yellow-600';
+            } else {
+                barEl.className = 'bg-blue-500 h-3 rounded-full transition-all duration-300';
+                countEl.className = 'font-bold text-blue-600';
+            }
+
+            // 残り回数が少ない時の警告
+            if (usageCount >= 8) {
+                showToast(`残り${10 - usageCount}回です。Pro版のご検討をお願いします。`, 'warning');
             }
         }
 
         // Pro版アップグレード
         function upgradeToPro() {
-            showToast('Pro版は開発中です。しばらくお待ちください！', 'info');
+            const features = `🌟 Pro版の特典:
+
+✅ 無制限使用
+✅ 50種類以上の高度モーション
+✅ バッチ変換機能
+✅ カスタムプリセット保存
+✅ API連携機能
+✅ 優先サポート
+✅ 新機能の先行アクセス
+
+月額: 1,480円
+年額: 14,800円 (2ヶ月分お得！)
+
+現在開発中です。リリース時にお知らせします！`;
+            
+            showToast(features, 'info');
+            
+            // 仮の登録機能
+            setTimeout(() => {
+                const email = prompt('Pro版リリース通知を受け取るメールアドレスを入力してください（任意）:');
+                if (email && email.includes('@')) {
+                    localStorage.setItem('videoprompter_email', email);
+                    showToast('通知リストに登録しました！', 'success');
+                }
+            }, 2000);
         }
 
-        // トースト通知
+        // トースト通知（改良版）
         function showToast(message, type = 'success') {
             const toast = document.getElementById('toast');
             const toastMessage = document.getElementById('toastMessage');
             
             // 色の設定
-            toast.className = `toast ${type === 'error' ? 'bg-red-500' : type === 'info' ? 'bg-blue-500' : 'bg-green-500'} text-white px-6 py-3 rounded-lg shadow-lg show`;
-            toastMessage.textContent = message;
+            const colors = {
+                success: 'bg-green-500',
+                error: 'bg-red-500',
+                warning: 'bg-orange-500',
+                info: 'bg-blue-500'
+            };
+            
+            toast.className = `toast ${colors[type] || colors.success} text-white px-6 py-3 rounded-lg shadow-lg show`;
+            toastMessage.innerHTML = message.replace(/\n/g, '<br>');
+            
+            // 自動消去時間の調整
+            const duration = type === 'info' ? 6000 : 3000;
             
             setTimeout(() => {
                 toast.classList.remove('show');
-            }, 3000);
+            }, duration);
         }
+
+        // キーボードショートカット
+        document.addEventListener('keydown', function(e) {
+            // Ctrl+Enter で変換実行
+            if (e.ctrlKey && e.key === 'Enter') {
+                if (selectedPlatform && selectedMotion) {
+                    copyToClipboard();
+                }
+            }
+            // Ctrl+K でプロンプトクリア
+            if (e.ctrlKey && e.key === 'k') {
+                e.preventDefault();
+                clearPrompt();
+            }
+            // Ctrl+I でサンプル読み込み
+            if (e.ctrlKey && e.key === 'i') {
+                e.preventDefault();
+                importFromExistingTool();
+            }
+        });
+
+        // レスポンシブ対応とモバイル最適化
+        function checkMobile() {
+            const isMobile = window.innerWidth < 768;
+            const container = document.querySelector('.container');
+            
+            if (isMobile) {
+                container.classList.remove('max-w-6xl');
+                container.classList.add('max-w-full');
+            } else {
+                container.classList.remove('max-w-full');
+                container.classList.add('max-w-6xl');
+            }
+        }
+
+        // リサイズイベント
+        window.addEventListener('resize', checkMobile);
+        checkMobile();
+
+        // パフォーマンス最適化：デバウンス
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // 入力のデバウンス処理
+        const debouncedUpdateOutput = debounce(updateOutput, 300);
+        document.getElementById('inputPrompt').removeEventListener('input', updateOutput);
+        document.getElementById('inputPrompt').addEventListener('input', debouncedUpdateOutput);
+
+        // エラーハンドリング
+        window.addEventListener('error', function(e) {
+            console.error('Error:', e);
+            showToast('予期しないエラーが発生しました。ページをリロードしてください。', 'error');
+        });
+
+        // 初期設定完了メッセージ
+        setTimeout(() => {
+            if (!localStorage.getItem('videoprompter_visited')) {
+                showToast('VideoPrompt Converterへようこそ！まずはプラットフォームとモーションを選択してください。', 'info');
+                localStorage.setItem('videoprompter_visited', 'true');
+            }
+        }, 1000);
     </script>
 </body>
 </html>
